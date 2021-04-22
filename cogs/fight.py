@@ -30,7 +30,7 @@ class Fight(commands.Cog):
             await ctx.send(f"{player.mention} deals {roll} damage to {target.mention}, who now has {p2_hp} HP!")
             await self.action(ctx, target, msg.author, p2_hp, p1_hp)
 
-    @commands.command(help="Fight another user, starting with 100 HP")
+    @commands.command(help="Challenge another user to a fight. Both players start with 100 HP and take turns attacking.")
     async def fight(self, ctx, target: discord.User):
         request = await ctx.send(f"{target.mention}, you have been challenged to a fight! Do you accept?")
         await request.add_reaction("✅")

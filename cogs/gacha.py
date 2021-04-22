@@ -57,7 +57,7 @@ class Gacha(commands.Cog):
         if isinstance(error, commands.BadArgument):
             await ctx.send('Use a numerical value when betting ' + emotes['paissabap'])
 
-    @commands.command(help="Check your current balance, or join the betting table and receive a balance of 10000 points")
+    @commands.command(help="Check your current balance, or join the betting table and receive a balance of 10000 points.")
     async def balance(self, ctx):
         player, server = self.get_ids(ctx, ctx.author.id)
         if self.at_table(ctx, player):
@@ -68,7 +68,7 @@ class Gacha(commands.Cog):
             self.TABLE[server][player] = 10000
             await ctx.send('Welcome to the betting table! Your balance is 10000 points.');
             
-    @commands.command(help="Gacha for a chance to reset your point balance. Can only be used when points are below 10000")
+    @commands.command(help="Gacha for a chance to reset your point balance. Can only be used when points are below 10000.")
     async def beg(self, ctx):
         player, server = self.get_ids(ctx, ctx.author.id)
         if not self.at_table(ctx, player):
