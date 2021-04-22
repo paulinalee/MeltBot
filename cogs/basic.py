@@ -24,7 +24,7 @@ class Basic(commands.Cog):
         await ctx.send(f"{users['fy']} {emotes['kree']}")
 
     @commands.command()
-    async def melt(self, ctx):
+    async def talk(self, ctx):
         await ctx.send(choices(dialogue)[0])
 
 def setup(bot):

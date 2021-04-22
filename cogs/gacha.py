@@ -1,8 +1,8 @@
 from discord.ext import commands
 import discord
-from random import randrange
+from random import randrange, choices
 from replit import db
-from config import emotes
+from config import emotes, beg_dialogue
 
 class Gacha(commands.Cog):
     def __init__(self, bot):
@@ -10,6 +10,9 @@ class Gacha(commands.Cog):
     
     @commands.command(description='Bet against Melt. Usage: !bet [wager]')
     async def bet(self, ctx, wager: int):
+        if wager < 0:
+            return await ctx.send("Cannot bet a negative value!")
+            
         user = str(ctx.author.id)
         balance = 10000
         
@@ -63,11 +66,12 @@ class Gacha(commands.Cog):
             return await ctx.send(f"You already have {db[user]} points! No begging {emotes['paissabap']}")
 
         if (user_roll == 3):
-            return await ctx.send(f"Congratulations! Your balance has been reset to 10000 points. {emotes['paimonfrench']}")
+            db[user] = 10000
+            return await ctx.send(f"Hmph, I guess I can reset your points just this once...")
         else:
-            await ctx.send(f"Melt looks at you with disgust. Your balance remains at {db[user]} point{'s'[:int(db[user])^1]}.")
+            await ctx.send(f"{choices(beg_dialogue)[0]} (It seems your efforts were unsuccessful... Your balance remains {db[user]} point{'s'[:int(db[user])^1]}.)")
 
-    @commands.command(description="Gift another user points from your own balance. Usage: !gift [mention user] [points]")
+    @commands.command(description="Gift another user points from your own balance. Usage: !gift [user] [points]")
     async def gift(self, ctx, target: discord.User, points: int):
         user = str(ctx.author.id)
         other = str(target.id)

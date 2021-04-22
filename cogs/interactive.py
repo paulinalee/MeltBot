@@ -6,7 +6,7 @@ class Interactive(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(description="Create a poll with up to 10 options. Usage: !vote [title] [choice 1]/[choice2]/[choice 3]")
+    @commands.command(description="Create a poll with up to 10 options. Usage: !vote [question] [choice 1]/[choice 2]/[choice 3]")
     async def vote(self, ctx, title, *args):
         split_args = ' '.join(args).split('/')
         if (len(split_args) > 10):

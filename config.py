@@ -46,9 +46,8 @@ dialogue = [
     "I'm the Alter Ego of pleasure, Meltryllis. I'd really rather not, but I suppose I'll form a contract with you. You should be honored, okay?",
     "You really do things in a roundabout way. Whatever.",
     "Transformation for someone as perfect as me is unnecessary... But I suppose if you insist, i’ll put up with it.",
-    "Good work on your futile efforts. Satisfied?",
     "Are you looking for a even stronger doll? Or a new look for me? Either way, you got what you wanted.",
-    "...How unpleasent. Very unpleasant. My body, which was perfect and needed nothing else, has changed! And not only that, I’m actually quite pleased with it!? You’d better take responsibility for making me this way!",
+    "...How unpleasant. Very unpleasant. My body, which was perfect and needed nothing else, has changed! And not only that, I’m actually quite pleased with it!? You’d better take responsibility for making me this way!",
     "I'll cut you up.",
     "Trample them underfoot...? How delicious.",
     "I shall melt all traces of life... Flesh and soul... Here I go...here I go...here I go...HERE I GO...! Sarasvati Meltout!",
@@ -56,4 +55,23 @@ dialogue = [
     "You're done already? Come back another time.",
     "Don't come near me. You're just my temporary Master who managed to call me up by pure chance. Know that you are not even close to being my equal.",
     "A relationship of subordinate and superior? what are you talking about? We just have mutual interests. That's all. Don't ever forget that."
+]
+
+beg_dialogue = [
+    "How sad for you!",
+    "Humans never learn.",
+    "Good work on your futile efforts. Satisfied?",
+    "...You're so persistent. Aren't you afraid of me?",
+    "Let me tell you that I will never like you.",
+    "...How unpleasent. Very unpleasant.",
+    "You think I'll give you points just like that?",
+    "I'll cut you up.",
+    "Hmph."
+]
+
+fight_actions = [
+    '<:paissagun:759606510044577812>',
+    '<a:frogpunch:827760096691617832>',
+    '<:paimonknife:760304470881468466>',
+    '<:paissabap:763962313845112833>'
 ]
