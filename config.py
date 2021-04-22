@@ -16,7 +16,7 @@ users = {
     'fy': '<@115223207107231744>'
 }
 
-poll_options = [
+poll_option_labels = [
     ':one:',
     ':two:',
     ':three:',
@@ -73,5 +73,8 @@ fight_actions = [
     '<:paissagun:759606510044577812>',
     '<a:frogpunch:827760096691617832>',
     '<:paimonknife:760304470881468466>',
-    '<:paissabap:763962313845112833>'
+    '<:paissabap:763962313845112833>',
+    '<:paissaknife:769080641794605078>',
+    '<:paissatank:764155628527812618>',
+    '<a:KoroneBonk:759621147398242314>'
 ]

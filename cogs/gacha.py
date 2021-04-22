@@ -7,8 +7,9 @@ from config import emotes, beg_dialogue
 class Gacha(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.description="Gambling functions."
     
-    @commands.command(description='Bet against Melt. Usage: !bet [wager]')
+    @commands.command(help='Bet against Melt.')
     async def bet(self, ctx, wager: int):
         if wager < 0:
             return await ctx.send("Cannot bet a negative value!")
@@ -46,7 +47,7 @@ class Gacha(commands.Cog):
         if isinstance(error, commands.BadArgument):
             await ctx.send('Use a numerical value when betting ' + emotes['paissabap'])
 
-    @commands.command(description="Check your current balance, or join the betting table and receive a balance of 10000 points. Usage: !balance")
+    @commands.command(help="Check your current balance, or join the betting table and receive a balance of 10000 points")
     async def balance(self, ctx):
         user = str(ctx.author.id)
         if user in db:
@@ -55,7 +56,7 @@ class Gacha(commands.Cog):
             db[user] = 10000
             await ctx.send('Welcome to the betting table! Your balance is 10000 points.');
             
-    @commands.command(description="Gacha for a chance to reset your point balance. Can only be used when points are below 10000. Usage: !beg")
+    @commands.command(help="Gacha for a chance to reset your point balance. Can only be used when points are below 10000")
     async def beg(self, ctx):
         user = str(ctx.author.id)
         if user not in db:
@@ -71,7 +72,7 @@ class Gacha(commands.Cog):
         else:
             await ctx.send(f"{choices(beg_dialogue)[0]} (It seems your efforts were unsuccessful... Your balance remains {db[user]} point{'s'[:int(db[user])^1]}.)")
 
-    @commands.command(description="Gift another user points from your own balance. Usage: !gift [user] [points]")
+    @commands.command(help="Gift another user points from your own balance.")
     async def gift(self, ctx, target: discord.User, points: int):
         user = str(ctx.author.id)
         other = str(target.id)

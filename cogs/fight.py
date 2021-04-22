@@ -9,6 +9,7 @@ class Fight(commands.Cog):
     NO = '\u274c'
     def __init__(self, bot):
         self.bot = bot
+        self.description="Module that handles fight minigame."
 
     async def action(self, ctx, player, target, p1_hp, p2_hp):
         await ctx.send(f"{player.mention}, your move! Type 'attack' to take a turn.")
@@ -29,7 +30,7 @@ class Fight(commands.Cog):
             await ctx.send(f"{player.mention} deals {roll} damage to {target.mention}, who now has {p2_hp} HP!")
             await self.action(ctx, target, msg.author, p2_hp, p1_hp)
 
-    @commands.command(description="Fight another user, starting with 100 HP. Usage: !fight [user]")
+    @commands.command(help="Fight another user, starting with 100 HP")
     async def fight(self, ctx, target: discord.User):
         request = await ctx.send(f"{target.mention}, you have been challenged to a fight! Do you accept?")
         await request.add_reaction("✅")
