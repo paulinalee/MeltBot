@@ -2,7 +2,8 @@ cogs = [
   'cogs.gacha',
   'cogs.basic',
   'cogs.interactive',
-  'cogs.fight'
+  'cogs.fight',
+  'cogs.admin'
 ]
 
 emotes = {

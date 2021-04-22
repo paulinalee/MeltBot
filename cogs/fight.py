@@ -12,7 +12,7 @@ class Fight(commands.Cog):
         self.description="Module that handles fight minigame."
 
     async def action(self, ctx, player, target, p1_hp, p2_hp):
-        await ctx.send(f"{player.mention}, your move! Type 'attack' to take a turn.")
+        await ctx.send(f"{player.mention}, your move! Type `attack` to take a turn.")
 
         def check(msg):
             return msg.author == player and msg.content.lower() == 'attack'

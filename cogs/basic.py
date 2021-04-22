@@ -1,6 +1,8 @@
 from discord.ext import commands
 from random import choices
 from config import emotes, users, dialogue
+import re
+from replit import db
 
 class Basic(commands.Cog):
     def __init__(self, bot):
@@ -18,19 +20,33 @@ class Basic(commands.Cog):
     
     @commands.command(help='Pings Kaina')
     async def ping(self, ctx):
+        if not self.in_server(ctx, users['kaina']):
+            return await ctx.send("Sorry! This command is only available in specific servers.")
         await ctx.send(f"{users['kaina']} {emotes['kree']}")
 
     @commands.command(help='Pings spoof')
     async def pong(self, ctx):
+        if not self.in_server(ctx, users['fy']):
+            return await ctx.send("Sorry! This command is only available in specific servers.")
         await ctx.send(f"{users['fy']} {emotes['kree']}")
+    
+    def in_server(self, ctx, ping_str):
+        id = int(re.search(r'\d+', ping_str).group())
+        return ctx.guild.get_member(id) != None
 
     @commands.command(help='Get a Melt voice line.')
     async def talk(self, ctx):
         await ctx.send(choices(dialogue)[0])
 
-    @commands.command(aliases=['commandlist', 'h'], help='View list of available commands.')
-    async def commands(self, ctx, *args):
+    @commands.command(aliases=['cmds', 'h'], help='View list of available commands.')
+    async def commandlist(self, ctx, *args):
         await ctx.send_help(*args)
+
+    @commands.command(help='Change the bot prefix for this server.')
+    async def prefix(self, ctx, new_prefix: str):
+        server = str(ctx.guild.id)
+        db['prefix'][server] = new_prefix
+        await ctx.send(f"Prefix changed to `{new_prefix}`!")
 
 def setup(bot):
     bot.add_cog(Basic(bot))
