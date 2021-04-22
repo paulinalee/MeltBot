@@ -1,11 +1,11 @@
 import discord
 from config import poll_reacts, poll_option_labels, emotes
 from discord.ext import commands
-from asyncio import sleep
+from asyncio import sleep, create_task
 import typing
 
 class Interactive(commands.Cog):
-    POLL_INSTRUCTIONS = "To vote, react to the option you want to vote for before the poll expires. You can vote for multiple options for this type of poll."
+    POLL_INSTRUCTIONS = "To vote, react to the option you want to vote for before the poll expires. You can vote for multiple options for this type of poll. The creator can close the poll at any time before the duration is up by reacting with ✅"
     def __init__(self, bot):
         self.bot = bot
         self.description="Functions that rely a lot on user input, but aren't exactly games."
@@ -14,7 +14,7 @@ class Interactive(commands.Cog):
     async def votenotify(self, ctx, title, duration: typing.Optional[int]=20, *args):
         await self.vote(ctx, title, duration, True, *args)
 
-    @commands.command(help="Create a poll with up to 10 options and an optional poll duration. If duration is not specified, it will be 20 seconds by default. The creator of the poll can also request to be notified via mention once the poll concludes.", aliases=['poll', 'v'])
+    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Includes the option to be pinged once the poll finishes and manual poll closing via reacting with ✅", aliases=['poll', 'v'])
     async def vote(self, ctx, title, duration: typing.Optional[int]=20, notify: typing.Optional[bool]=False, *args):
         poll_options = ' '.join(args).split('/')
         if len(poll_options) > 10:
@@ -36,19 +36,37 @@ class Interactive(commands.Cog):
         # set up voting and wait until poll closes
         for i in range(max_iters):
             await message.add_reaction(emoji=poll_reacts[i])
+        await message.add_reaction("✅")
+
+        # make background task to end the poll/count votes
+        poll_task = create_task(self.manage_poll(ctx, message, duration, title, poll_options, notify))
+
+        # meanwhile, listen for incoming checkmark react which can prematurely end the poll
+        def check(reaction, user):
+            return user == ctx.author and str(reaction.emoji) == "✅"
+      
+        reaction, user = await self.bot.wait_for('reaction_add', check=check)
+        if reaction.emoji == "✅":
+            # end the background task managing poll and manually end it
+            poll_task.cancel()
+            await self.end_poll(ctx, message, duration, title, poll_options, notify)
+
+    async def manage_poll(self, ctx, message, duration, title, poll_options, notify):
         await sleep(duration)
+        await self.end_poll(ctx, message, duration, title, poll_options, notify)
+       
+    async def end_poll(self, ctx, message, duration, title, poll_options, notify):
         message = await ctx.fetch_message(message.id)
 
         poll_close_embed = message.embeds[0]
         poll_close_embed.title = f"[CLOSED] Poll: {title}"
         await message.edit(embed=poll_close_embed)
-        print('done')
 
         # find winning option
         max_count = 0
         max_index = None
         winning_options = []
-        for i in range(len(message.reactions)):
+        for i in range(len(message.reactions) - 1):
             curr_count = message.reactions[i].count - 1 # subtract the bot's own react
             if (curr_count > max_count):
                 max_count = curr_count
@@ -56,7 +74,6 @@ class Interactive(commands.Cog):
                 winning_options = [poll_options[i]]
             elif (curr_count == max_count):
                 winning_options.append(poll_options[i])
-        
         if max_index == None:
             return await ctx.send("It looks like there were no votes on this poll, so I can't determine a winning choice.")
         
@@ -71,14 +88,14 @@ class Interactive(commands.Cog):
             result_msg += f"\nThe winning option is: {winning_options[0]}!"
         else:
             result_msg += f"\nThere appears to be a tie, the winning poll_options are: {', '.join(winning_options)}!"
-
         await ctx.send(result_msg)
-
 
     @vote.error
     async def vote_error(self, ctx, error):
         if isinstance(error, commands.BadArgument) or isinstance(error, commands.InvalidEndOfQuotedStringError):
             await ctx.send(f"Stop breaking the bot ree {emotes['kree']}")
+        else:
+            await ctx.send(f"{error}")
 
 def setup(bot):
     bot.add_cog(Interactive(bot))
