@@ -3,7 +3,8 @@ cogs = [
   'cogs.basic',
   'cogs.interactive',
   'cogs.fight',
-  'cogs.admin'
+  'cogs.admin',
+  'cogs.time'
 ]
 
 emotes = {
@@ -64,7 +65,7 @@ beg_dialogue = [
     "Good work on your futile efforts. Satisfied?",
     "...You're so persistent. Aren't you afraid of me?",
     "Let me tell you that I will never like you.",
-    "...How unpleasent. Very unpleasant.",
+    "...How unpleasant. Very unpleasant.",
     "You think I'll give you points just like that?",
     "I'll cut you up.",
     "Hmph."

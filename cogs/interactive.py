@@ -1,7 +1,7 @@
 import discord
 from config import poll_reacts, poll_option_labels, emotes
 from discord.ext import commands
-from asyncio import sleep, create_task
+import asyncio
 import typing
 
 class Interactive(commands.Cog):
@@ -10,11 +10,11 @@ class Interactive(commands.Cog):
         self.bot = bot
         self.description="Functions that rely a lot on user input, but aren't exactly games."
 
-    @commands.command(help="Create a poll and get notified via mention once the poll ends. For more info on polls, try !help vote.", aliases=['pollnotify', 'vn'])
+    @commands.command(help=f"Create a poll and get notified via mention once the poll ends. For more info on polls, see vote.", aliases=['pollnotify', 'vn'])
     async def votenotify(self, ctx, title, duration: typing.Optional[int]=20, *args):
         await self.run_poll(ctx, title, duration, True, *args)
 
-    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Poll options should be separated by slashes (/). Use !votenotify or !vn instead if you want to be notified via mention once the poll ends.", aliases=['poll', 'v'])
+    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Poll options should be separated by slashes (/). Use the votenotify or vn commands instead if you want to be notified via mention once the poll ends.", aliases=['poll', 'v'])
     async def vote(self, ctx, title, duration: typing.Optional[int]=20, *args):
         await self.run_poll(ctx, title, duration, False, *args)
 
@@ -43,20 +43,23 @@ class Interactive(commands.Cog):
         await message.add_reaction("✅")
 
         # make background task to end the poll/count votes
-        poll_task = create_task(self.manage_poll(ctx, message, duration, title, poll_options, notify))
+        poll_task = asyncio.create_task(self.manage_poll(ctx, message, duration, title, poll_options, notify))
 
         # meanwhile, listen for incoming checkmark react which can prematurely end the poll
         def check(reaction, user):
             return user == ctx.author and str(reaction.emoji) == "✅"
       
-        reaction, user = await self.bot.wait_for('reaction_add', check=check)
-        if reaction.emoji == "✅":
-            # end the background task managing poll and manually end it
-            poll_task.cancel()
-            await self.end_poll(ctx, message, duration, title, poll_options, notify)
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=duration, check=check)
+            if reaction.emoji == "✅":
+                # end the background task managing poll and manually end it
+                poll_task.cancel()
+                await self.end_poll(ctx, message, duration, title, poll_options, notify)
+        except asyncio.TimeoutError:
+            return
     
     async def manage_poll(self, ctx, message, duration, title, poll_options, notify):
-        await sleep(duration)
+        await asyncio.sleep(duration)
         await self.end_poll(ctx, message, duration, title, poll_options, notify)
        
     async def end_poll(self, ctx, message, duration, title, poll_options, notify):

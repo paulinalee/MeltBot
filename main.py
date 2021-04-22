@@ -7,15 +7,23 @@ from replit import db
 
 class MeltBot(Bot):
     DEFAULT_PREFIX = '!'
-
+    
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
         super().__init__(command_prefix=self.determine_prefix, description="Your favorite Alter Ego, now as a bot. [under development]",
                 help_command=PrettyHelp(), intents=intents, case_insensitive=True)
    
-    async def determine_prefix(self, bot, message):
+    def determine_prefix(self, bot, message):
         server = str(message.guild.id)
+        return self.prefix_helper(server)
+    
+    def ctx_prefix(self, ctx):
+        # basically the same as above but using ctx instead of message to grab the server id
+        server = str(ctx.guild.id)
+        return self.prefix_helper(server)
+
+    def prefix_helper(self, server):
         if 'prefix' not in db:
             # init the server prefix db in case I wipe the db
             db['prefix'] = {}

@@ -72,7 +72,7 @@ class Gacha(commands.Cog):
     async def beg(self, ctx):
         player, server = self.get_ids(ctx, ctx.author.id)
         if not self.at_table(ctx, player):
-            return await ctx.send('Sorry, this command is only available for existing players! Use the command !balance to join the table.');
+            return await ctx.send(f"Sorry, this command is only available for existing players! Use the command `{self.bot.ctx_prefix(ctx)}balance` to join the table.");
 
         player_roll = randrange(0, 5)
         if (self.TABLE[server][player] >= 10000):
@@ -84,14 +84,15 @@ class Gacha(commands.Cog):
         else:
             await ctx.send(f"{choices(beg_dialogue)[0]} (It seems your efforts were unsuccessful... Your balance remains {self.TABLE[server][player]} point{'s'[:int(self.TABLE[server][player])^1]}.)")
 
-    @commands.command(help="Gift another player points from your own balance.")
-    async def gift(self, ctx, target: discord.player, points: int):
+    @commands.command(help="Gift another player points from your own balance.", aliases=['give'])
+    async def gift(self, ctx, target: discord.User, points: int):
         player, server = self.get_ids(ctx, ctx.author.id)
         target_player = str(target.id)
-        if not self.at_table(target_player):
-            return await ctx.send("Cannot gift points to a player who hasn't joined the table! You can join the table with the !balance command.");
+        prefix = self.bot.ctx_prefix(ctx)
+        if not self.at_table(ctx, target_player):
+            return await ctx.send(f"Cannot gift points to a player who hasn't joined the table! You can join the table with the `{prefix}balance` command.");
         if not self.at_table(ctx, player):
-            return await ctx.send("Cannot gift points before joining the table! Please initialize your balance with the !balance command.");
+            return await ctx.send(f"Cannot gift points before joining the table! Please initialize your balance with the `{prefix}balance` command.");
         if (points < 0):
             return await ctx.send(f"Unable to gift negative point value!");
 
