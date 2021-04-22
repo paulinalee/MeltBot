@@ -12,11 +12,15 @@ class Interactive(commands.Cog):
 
     @commands.command(help="Create a poll and get notified via mention once the poll ends. For more info on polls, try !help vote.", aliases=['pollnotify', 'vn'])
     async def votenotify(self, ctx, title, duration: typing.Optional[int]=20, *args):
-        await self.vote(ctx, title, duration, True, *args)
+        await self.run_poll(ctx, title, duration, True, *args)
 
-    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Includes the option to be pinged once the poll finishes and manual poll closing via reacting with ✅", aliases=['poll', 'v'])
-    async def vote(self, ctx, title, duration: typing.Optional[int]=20, notify: typing.Optional[bool]=False, *args):
+    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Poll options should be separated by slashes (/). Use !votenotify or !vn instead if you want to be notified via mention once the poll ends.", aliases=['poll', 'v'])
+    async def vote(self, ctx, title, duration: typing.Optional[int]=20, *args):
+        await self.run_poll(ctx, title, duration, False, *args)
+
+    async def run_poll(self, ctx, title, duration, notify=False, *args):
         poll_options = ' '.join(args).split('/')
+    
         if len(poll_options) > 10:
             return await ctx.send('Sorry, polls only support up to 10 options! Please try again.')
 
@@ -50,7 +54,7 @@ class Interactive(commands.Cog):
             # end the background task managing poll and manually end it
             poll_task.cancel()
             await self.end_poll(ctx, message, duration, title, poll_options, notify)
-
+    
     async def manage_poll(self, ctx, message, duration, title, poll_options, notify):
         await sleep(duration)
         await self.end_poll(ctx, message, duration, title, poll_options, notify)
@@ -94,8 +98,6 @@ class Interactive(commands.Cog):
     async def vote_error(self, ctx, error):
         if isinstance(error, commands.BadArgument) or isinstance(error, commands.InvalidEndOfQuotedStringError):
             await ctx.send(f"Stop breaking the bot ree {emotes['kree']}")
-        else:
-            await ctx.send(f"{error}")
 
 def setup(bot):
     bot.add_cog(Interactive(bot))

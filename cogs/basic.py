@@ -28,5 +28,9 @@ class Basic(commands.Cog):
     async def talk(self, ctx):
         await ctx.send(choices(dialogue)[0])
 
+    @commands.command(aliases=['commandlist', 'h'], help='View list of available commands.')
+    async def commands(self, ctx, *args):
+        await ctx.send_help(*args)
+
 def setup(bot):
     bot.add_cog(Basic(bot))
