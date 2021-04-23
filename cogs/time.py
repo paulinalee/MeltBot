@@ -21,36 +21,43 @@ class Time(commands.Cog):
         self.bot = bot
         self.description="Utility functions related to time."
     
-    @commands.command(help="[under development]", aliases=['timenow', 'currenttime'])
+    @commands.command(help="Check the current time for a timezone. Uses UTC if no timezone specified.", aliases=['timenow'])
     async def now(self, ctx, zone: typing.Optional[str]=None):
         tz = None
-        print(zone)
+        original_zone = None
+
         if zone is not None:
-            print('hi')
+            # checking if we've used a common abbreviation
+            zone = self.check_abbreviations(zone.upper())
+            original_zone = zone
+            zone = self.modify_gmt(zone)
             try:
                 tz = timezone(zone)
             except:
-                return await ctx.send("Invalid timezone.")
+                return await ctx.send("Invalid timezone provided.")
         else:
+            zone = 'UTC'
+            original_zone = zone
             tz = timezone("UTC")
         
-        print(datetime.now(tz))
-        print('finish')
+        time_date = datetime.now(tz)
+        formatted_time = time_date.strftime("%b %d, %Y, %H:%M (%I:%M %p)")
+        await ctx.send(f"🕒 It is currently **{formatted_time}** in **{original_zone.upper()}**.")
 
     @commands.command(brief="Convert from one timezone to another.",
         help="Convert a time (24 hour format) to a specific timezone.\n\nFor convenience, some timezone abbreviations will be synonymous to a zone regardless of daylight savings. As an example, EST will be interpreted as the US/Eastern timezone, even if US/Eastern is currently observing EDT, since EST is the more common abbreviation.\n\nThe converted time will also be auto-adjusted for DST based on the current date (so converting 1:00 from CST to JST would be like converting 1:00 on the current date in CST to JST).",
-        aliases=['converttime', 'whattime'])
+        aliases=['tz'])
     async def convert(self, ctx, requested_time: str, from_zone: str, to_zone: str, *args):
         from_zone, to_zone = from_zone.upper(), to_zone.upper() # make same case before comparing
-        original_from, original_to = from_zone, to_zone # save for output before processing for conversion
         
         date_str = ' '.join(args)
-        print(date_str)
         time_date = dateparser.parse(date_str)
-        print(time_date)
 
-        # checking if we've used a common abbreviation that's not in pytz
+        # checking if we've used a common abbreviation
         from_zone, to_zone = self.check_abbreviations(from_zone), self.check_abbreviations(to_zone)
+
+        # save for output before processing for conversion, we save here instead of after the next line to prevent saving the confusing etc/gmt zones
+        original_from, original_to = from_zone, to_zone
 
         # for some ungodly reason etc/gmt+10 actually means gmt-10, so we have to finangle our args into shape
         # see https://en.wikipedia.org/wiki/Tz_database
@@ -59,8 +66,6 @@ class Time(commands.Cog):
         try:
             from_tz = timezone(from_zone)
             to_tz = timezone(to_zone)
-            print(from_tz)
-            print(to_tz)
         except:
             return await ctx.send("Please recheck timezone format.")
 
@@ -75,15 +80,6 @@ class Time(commands.Cog):
             time_to_convert = datetime(time_date.year, time_date.month, time_date.day, int(hours), int(minutes))
             time_to_convert = from_tz.localize(time_to_convert)
             converted_time = time_to_convert.astimezone(to_tz)
-            print(time_to_convert)
-            print(converted_time)
-            print(time_to_convert.dst())
-            print(converted_time.dst())
-            if (time_to_convert.dst()):
-                print('first time in dst')
-            if (converted_time.dst()):
-                print('second  time in dst')
-
             await ctx.send(embed=self.format_embed(original_from, original_to, time_to_convert, converted_time))
         except ValueError:
             return await ctx.send("Invalid time format!")
