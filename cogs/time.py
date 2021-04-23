@@ -9,6 +9,7 @@ class Time(commands.Cog):
     # mapping common abbreviations that aren't in pytz since they can refer to multiple zones
     TIMEZONE_ABBREVIATIONS = {
         'EST': 'US/Eastern',
+        'EDT': 'GMT-4',
         'PST': 'US/Pacific',
         'CST': 'US/Central',
         'JST': 'Japan',
@@ -21,7 +22,7 @@ class Time(commands.Cog):
         self.bot = bot
         self.description="Utility functions related to time."
     
-    @commands.command(help="Check the current time for a timezone. Uses UTC if no timezone specified.", aliases=['timenow'])
+    @commands.command(help="Check the current time for a timezone. Uses UTC if no timezone specified.", aliases=['timein', 'time'])
     async def now(self, ctx, zone: typing.Optional[str]=None):
         tz = None
         original_zone = None
@@ -45,7 +46,13 @@ class Time(commands.Cog):
         await ctx.send(f"🕒 It is currently **{formatted_time}** in **{original_zone.upper()}**.")
 
     @commands.command(brief="Convert from one timezone to another.",
-        help="Convert a time (24 hour format) to a specific timezone.\n\nFor convenience, some timezone abbreviations will be synonymous to a zone regardless of daylight savings. As an example, EST will be interpreted as the US/Eastern timezone, even if US/Eastern is currently observing EDT, since EST is the more common abbreviation.\n\nThe converted time will also be auto-adjusted for DST based on the current date (so converting 1:00 from CST to JST would be like converting 1:00 on the current date in CST to JST).",
+        help='''Convert a time (24 hour format) to a specific timezone. If no date is passed in, the current date will be used.
+        
+        For convenience, some timezone abbreviations will be synonymous to a geographical zone instead of their GMT/UTC offset. As an example, EST will be interpreted as US/Eastern, even if US/Eastern is currently on EDT, since EST is commonly used regardless.
+        
+        Sample usages with default prefix:
+            !convert 14:00 EST PST March 24
+            !convert 3:25 gmt+2 jst 23 may''',
         aliases=['tz'])
     async def convert(self, ctx, requested_time: str, from_zone: str, to_zone: str, *args):
         from_zone, to_zone = from_zone.upper(), to_zone.upper() # make same case before comparing
@@ -84,23 +91,24 @@ class Time(commands.Cog):
         except ValueError:
             return await ctx.send("Invalid time format!")
 
-    def format_embed(self, start_tz, dest_tz, s_datettime, d_datettime):
+    def format_embed(self, start_tz, dest_tz, s_datetime, d_datetime):
         day_modifier = ''
-        if d_datettime.date() > s_datettime.date():
+        if d_datetime.date() > s_datetime.date():
             day_modifier = ' (next day)'
-        elif d_datettime.date() < s_datettime.date():
+        elif d_datetime.date() < s_datetime.date():
             day_modifier = ' (previous day)'
 
-        start_time = s_datettime.strftime(f"%H:%M (%I:%M %p)\n%b %d, %Y\n\n**In DST?**\n{'Yes' if s_datettime.dst() else 'No'}")
-        end_time = d_datettime.strftime(f"%H:%M (%I:%M %p)\n%b %d, %Y{day_modifier}\n\n**In DST?**\n{'Yes' if d_datettime.dst() else 'No'}")
+        start_time = s_datetime.strftime(f"%H:%M (%I:%M %p)\n%b %d, %Y\n\n**In DST?**\n{self.check_dst_applicable(s_datetime, start_tz)}")
+        end_time = d_datetime.strftime(f"%H:%M (%I:%M %p)\n%b %d, %Y{day_modifier}\n\n**In DST?**\n{self.check_dst_applicable(d_datetime, dest_tz)}")
 
         embed = discord.Embed(title='🕒 Convert Time')
+        embed.description = 'Note: Abbreviations for GMT/UTC zones will not have DST information.'
         embed.add_field(name=start_tz, value=start_time, inline=True)
         embed.add_field(name=dest_tz, value=end_time, inline=True)
         return embed
 
+    # returns what the abbreviation corresponds to if it exists in TIMEZONE_ABBREVIATIONS, otherwise returns original value
     def check_abbreviations(self, timezone):
-        # returns what the abbreviation corresponds to if it exists in TIMEZONE_ABBREVIATIONS, otherwise returns original value
         return self.TIMEZONE_ABBREVIATIONS[timezone].upper() if timezone in self.TIMEZONE_ABBREVIATIONS else timezone
     
     def modify_gmt(self, gmt):
@@ -111,6 +119,13 @@ class Time(commands.Cog):
         elif '+' in gmt:
             gmt = gmt.replace('+', '-', 1)
         return gmt
+
+    # returns whether the zone is observing DST for the given date_time, or Not Applicable if the zone is not a geographical region (like UTC)
+    def check_dst_applicable(self, date_time, timezone):
+        if 'GMT' not in timezone and 'UTC' not in timezone:
+            return 'Yes' if date_time.dst() else 'No'
+        else:
+            return 'Not Applicable'
 
 def setup(bot):
     bot.add_cog(Time(bot))

@@ -10,11 +10,11 @@ class Interactive(commands.Cog):
         self.bot = bot
         self.description="Functions that rely a lot on user input, but aren't exactly games."
 
-    @commands.command(help=f"Create a poll and get notified via mention once the poll ends. For more info on polls, see vote.", aliases=['pollnotify', 'vn'])
+    @commands.command(help=f"Create a poll and get mentioned once the poll ends. For more info on polls, see vote.", aliases=['pollnotify', 'vn'])
     async def votenotify(self, ctx, title, duration: typing.Optional[int]=20, *args):
         await self.run_poll(ctx, title, duration, True, *args)
 
-    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Poll options should be separated by slashes (/). Use the votenotify or vn commands instead if you want to be notified via mention once the poll ends.", aliases=['poll', 'v'])
+    @commands.command(help="Create a poll with up to 10 options and an optional poll duration (20 seconds by default). Poll options should be separated by slashes (/). Use the votenotify command instead if you want to be pinged once the poll ends.", aliases=['poll', 'v'])
     async def vote(self, ctx, title, duration: typing.Optional[int]=20, *args):
         await self.run_poll(ctx, title, duration, False, *args)
 
@@ -81,8 +81,6 @@ class Interactive(commands.Cog):
                 winning_options = [poll_options[i]]
             elif (curr_count == max_count):
                 winning_options.append(poll_options[i])
-        if max_index == None:
-            return await ctx.send("It looks like there were no votes on this poll, so I can't determine a winning choice.")
         
         closing_blurb = f"The poll {title} has closed."
         result_msg = ''
@@ -90,6 +88,9 @@ class Interactive(commands.Cog):
             result_msg += f"{ctx.author.mention}, your poll {title} has ended!"
         else:
             result_msg += closing_blurb
+
+        if max_index == None:
+            return await ctx.send(f"{result_msg}\nIt looks like there were no votes on this poll, so I can't determine a winning option.")
 
         if (len(winning_options) == 1):
             result_msg += f"\nThe winning option is: {winning_options[0]}!"

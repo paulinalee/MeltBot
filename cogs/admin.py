@@ -8,7 +8,7 @@ class Admin(commands.Cog):
         self.bot = bot
         self.description="Admin/debug commands."
     
-    @commands.command(help="Reset points for the server.")
+    @commands.command(help="[admin] reset points for this server")
     async def equality(self, ctx):
         server = str(ctx.guild.id)
         if ctx.author.id == self.MY_ID:
@@ -21,7 +21,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Perish this command is not for you")
 
-    @commands.command(help="Reset all points for all servers (debug purposes)")
+    @commands.command(help="[admin] reset all points for all servers")
     async def thanos(self, ctx):
         if (ctx.author.id == self.MY_ID):
             for key in db:
@@ -35,7 +35,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Perish this command is not for you")
     
-    @commands.command(help="Kek")
+    @commands.command(help="[admin] drop all tables")
     async def drop(self, ctx):
         if (ctx.author.id == self.MY_ID):
             for key in db:
@@ -44,7 +44,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Perish this command is not for you")
     
-    @commands.command(help="Kek")
+    @commands.command(help="[admin] log all tables")
     async def tables(self, ctx):
         if (ctx.author.id == self.MY_ID):
             print('KEYS')

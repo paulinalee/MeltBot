@@ -19,12 +19,12 @@ class Probability(commands.Cog):
         self.bot = bot
         self.description="Gambling but not really but also kind of..."
 
-    @commands.command(help='Choose between any number of options, separated by /.')
+    @commands.command(help='Choose between any number of options, separated by slashes (/).', aliases=['decide'])
     async def choose(self, ctx, *args):
         split_args = ' '.join(args).split('/')
         await ctx.send(choices(split_args)[0])
     
-    @commands.command(help='Ask Melt a yes/no question.')
+    @commands.command(help='Ask a yes/no question.', aliases=['8ball'])
     async def ask(self, ctx, *args):
         await ctx.send(choices(self.ASK_RESPONSES)[0])
 

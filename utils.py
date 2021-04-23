@@ -1,0 +1,1 @@
+# TODO: move some stuff here (probably the reroll function that I've copy pasted like 3 times)

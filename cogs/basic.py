@@ -13,13 +13,13 @@ class Basic(commands.Cog):
     async def hello(self, ctx):
         await ctx.send('henlo')
     
-    @commands.command(help='Pings Kaina')
+    @commands.command(help=':kek')
     async def ping(self, ctx):
         if not self.in_server(ctx, users['kaina']):
             return await ctx.send("Sorry! This command is only available in specific servers.")
         await ctx.send(f"{users['kaina']} {emotes['kree']}")
 
-    @commands.command(help='Pings spoof')
+    @commands.command(help='you:')
     async def pong(self, ctx):
         if not self.in_server(ctx, users['fy']):
             return await ctx.send("Sorry! This command is only available in specific servers.")
@@ -33,7 +33,7 @@ class Basic(commands.Cog):
         id = int(re.search(r'\d+', ping_str).group())
         return ctx.guild.get_member(id) != None
 
-    @commands.command(help='Get a Melt voice line.')
+    @commands.command(help='Bootleg FGO My Room experience.')
     async def talk(self, ctx):
         await ctx.send(choices(dialogue)[0])
 
