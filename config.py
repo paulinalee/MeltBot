@@ -4,13 +4,16 @@ cogs = [
   'cogs.interactive',
   'cogs.fight',
   'cogs.admin',
-  'cogs.time'
+  'cogs.time',
+  'cogs.probability'
 ]
 
 emotes = {
     'paissabap': '<:paissabap:763962313845112833>',
     'paimonfrench': '<:paimonfrench:779382643497369620>',
-    'kree': '<a:kree:818022246730825749>'
+    'kree': '<a:kree:818022246730825749>',
+    'paissadab': '<a:paissadab:781426491572879390>',
+    'frogpunch': '<a:frogpunch:827760096691617832>'
 }
 
 users = {

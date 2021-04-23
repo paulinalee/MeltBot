@@ -33,9 +33,7 @@ class Time(commands.Cog):
         
 
     @commands.command(help="Convert from one timezone to another. Use at your own risk cause I hate working with time and it's probably janky as hell.", aliases=['converttime', 'whattime'])
-    async def convert(self, ctx, from_zone: str, to_zone: str, requested_time: str):
-        debug_str = f"converting {requested_time} from {from_zone} to {to_zone}"
-        print(debug_str)
+    async def convert(self, ctx, from_zone: str, requested_time: str, to_zone: str):
         # need to do some checks for potential funkiness since gmt+10 is under 'etc/gmt+10'
         from_zone, to_zone = from_zone.upper(), to_zone.upper()
         if from_zone.startswith('GMT'):
@@ -45,10 +43,6 @@ class Time(commands.Cog):
 
         # also checking if we've used a common abbreviation that's not in pytz
         from_zone, to_zone = self.check_abbreviations(from_zone), self.check_abbreviations(to_zone)
-
-        print((from_zone, to_zone))
-        debug_str = f"reformatted: {requested_time} from {from_zone} to {to_zone}"
-        print(debug_str)
         
         try:
             from_tz = timezone(from_zone)
@@ -66,11 +60,11 @@ class Time(commands.Cog):
             day_modifier = ''
 
             if converted_time.date() > from_time_now.date():
-                day_modifier = 'the next day'
+                day_modifier = ' the next day'
             elif converted_time.date() < from_time_now.date():
-                day_modifier = 'the previous day'
+                day_modifier = ' the previous day'
 
-            await ctx.send(f"🕒 {time_to_convert.hour:02}:{time_to_convert.minute:02} in {from_zone} is {converted_time.hour:02}:{converted_time.minute:02} {day_modifier} in {to_zone}!")
+            await ctx.send(f"🕒 {time_to_convert.hour:02}:{time_to_convert.minute:02} in {from_zone} is {converted_time.hour:02}:{converted_time.minute:02}{day_modifier} in {to_zone}!")
         except ValueError:
             return await ctx.send("Invalid time format!")
 

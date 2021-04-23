@@ -32,6 +32,12 @@ class Fight(commands.Cog):
 
     @commands.command(help="Challenge another user to a fight. Both players start with 100 HP and take turns attacking.")
     async def fight(self, ctx, target: discord.User):
+        if (target == self.bot.user):
+            await ctx.send(f"{emotes['frogpunch']}{emotes['frogpunch']}{emotes['frogpunch']}")
+            return await ctx.send(f"Melt looks at you with disgust.")
+
+        player_name = ctx.guild.get_member(ctx.author.id).display_name
+        target_name = ctx.guild.get_member(target.id).display_name
         request = await ctx.send(f"{target.mention}, you have been challenged to a fight! Do you accept?")
         await request.add_reaction("✅")
         await request.add_reaction("❌")
@@ -53,12 +59,12 @@ class Fight(commands.Cog):
                 while p1_roll == p2_roll:
                     p1_roll = randrange(0, 1000)
                     p2_roll = randrange(0, 1000)
-                roll_result = f"{ctx.author.name} rolled {p1_roll} and {target.name} rolled {p2_roll}!"
+                roll_result = f"{player_name} rolled {p1_roll} and {target_name} rolled {p2_roll}!"
                 if (p1_roll > p2_roll):
-                    await ctx.send(f"{roll_result}\n{ctx.author.name} will go first.")
+                    await ctx.send(f"{roll_result}\n{player_name} will go first.")
                     await self.action(ctx, ctx.author, target, 100, 100)
                 else:
-                    await ctx.send(f"{roll_result}\n{target.name} will go first.")
+                    await ctx.send(f"{roll_result}\n{target_name} will go first.")
                     await self.action(ctx, target, ctx.author, 100, 100)
 
     

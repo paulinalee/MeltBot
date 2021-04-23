@@ -12,11 +12,6 @@ class Basic(commands.Cog):
     @commands.command(help="Health check function.")
     async def hello(self, ctx):
         await ctx.send('henlo')
-
-    @commands.command(help='Choose between any number of options, separated by /.')
-    async def choose(self, ctx, *args):
-        split_args = ' '.join(args).split('/')
-        await ctx.send(choices(split_args)[0])
     
     @commands.command(help='Pings Kaina')
     async def ping(self, ctx):
@@ -30,6 +25,10 @@ class Basic(commands.Cog):
             return await ctx.send("Sorry! This command is only available in specific servers.")
         await ctx.send(f"{users['fy']} {emotes['kree']}")
     
+    @commands.command(help=':paissadab:')
+    async def dab(self, ctx):
+        await ctx.send(emotes['paissadab'])
+
     def in_server(self, ctx, ping_str):
         id = int(re.search(r'\d+', ping_str).group())
         return ctx.guild.get_member(id) != None

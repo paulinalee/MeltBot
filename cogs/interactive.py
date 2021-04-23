@@ -32,7 +32,7 @@ class Interactive(commands.Cog):
                 poll_content += '\n'
         
         embed = discord.Embed(title=f"Poll: {title}", description=f"{self.POLL_INSTRUCTIONS}\n\n{poll_content}")
-        embed.add_field(name='Creator', value=ctx.author.name, inline=True)
+        embed.add_field(name='Creator', value=ctx.guild.get_member(ctx.author.id).display_name, inline=True)
         embed.add_field(name='Duration', value=f"{duration}s", inline=True)
         embed.add_field(name='Notify?', value=f"{'On' if notify else 'Off'}", inline=True)
         message = await ctx.send(embed=embed)
