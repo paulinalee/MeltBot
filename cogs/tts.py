@@ -16,6 +16,9 @@ class TTS(commands.Cog):
     
     @commands.command(help="Speak some text.")
     async def s(self, ctx, *args):
+        if not self.user_in_vc(ctx):
+            return await ctx.send("Please join a voice channel first!")
+
         speech = ' '.join(args)
 
         tts = gTTS(speech, lang='en')
@@ -30,13 +33,18 @@ class TTS(commands.Cog):
 
     @commands.command(help="Summon Melt to the current voice channel.")
     async def join(self, ctx):
+        if not self.user_in_vc(ctx):
+            return await ctx.send("Please join a voice channel first!")
         channel = ctx.author.voice.channel
         self.voice = await channel.connect()
+
+    def user_in_vc(self, ctx):
+        return ctx.author.voice is not None
 
     @commands.command(help="Dismiss Melt from the voice channel.")
     async def leave(self, ctx):
         if not self.is_connected(ctx):
-            return await ctx.send('Not connected to a voice channel!')
+            return await ctx.send("I'm not connected to any voice channels!")
         await self.voice.disconnect()
         await ctx.send("You're done already? Come back another time.")
     
