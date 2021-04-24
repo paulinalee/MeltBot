@@ -5,7 +5,8 @@ cogs = [
   'cogs.fight',
   'cogs.admin',
   'cogs.time',
-  'cogs.probability'
+  'cogs.probability',
+  'cogs.tts'
 ]
 
 emotes = {
