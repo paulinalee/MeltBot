@@ -3,7 +3,8 @@ import discord
 from random import randrange, choices
 from replit import db
 from config import emotes, beg_dialogue
-
+from disputils import BotEmbedPaginator
+import typing
 
 class Gacha(commands.Cog):
     def __init__(self, bot):
@@ -12,10 +13,50 @@ class Gacha(commands.Cog):
         if 'gamble' not in db:
             db['gamble'] = {}
 
-    @commands.command(help='Bet against Melt.')
-    async def bet(self, ctx, wager: int):
-        if wager < 0:
-            return await ctx.send("Cannot bet a negative value!")
+    @commands.command(help="Check the betting leaderboard.", aliases=['leaderboards', 'rankings'])
+    async def leaderboard(self, ctx):
+        LEADERBOARD_PAGE_LIMIT = 15
+        if not self.server_table_exists(ctx):
+            return await ctx.send(f"No leaderboard available, no one in the server has made any bets! Use `{self.bot.ctx_prefix(ctx)}help bet` to see how to play.")
+
+        server = db['gamble'][str(ctx.guild.id)]
+        leaderboard = sorted(server, key=server.get, reverse=True)
+        
+        output_list = []
+        users = []
+        pts = []
+        for player_id in leaderboard:
+            player_name = ctx.guild.get_member(int(player_id)).display_name
+            player_pts = server[player_id]
+            output_list.append(f"{player_name}: {player_pts}")
+            users.append(player_name)
+            pts.append(str(player_pts))
+        
+        paginated_users = [users[x:x + LEADERBOARD_PAGE_LIMIT] for x in range(0, len(users), LEADERBOARD_PAGE_LIMIT)]
+        paginated_pts = [pts[x:x + LEADERBOARD_PAGE_LIMIT] for x in range(0, len(pts), LEADERBOARD_PAGE_LIMIT)]
+        embeds = []
+        for i in range(len(paginated_users)):
+            embed = discord.Embed(title='Betting Leaderboard')
+            embed.add_field(name='Player', value='\n'.join(paginated_users[i]), inline=True)
+            embed.add_field(name='Points', value='\n'.join(paginated_pts[i]), inline=True)
+            embeds.append(embed)
+        
+        paginator = BotEmbedPaginator(ctx, embeds)
+        await paginator.run()
+
+    @commands.command(help='Bet against Melt. Wager can be a numerical value, or \"all\" to bet everything.', aliases=['gamble'])
+    async def bet(self, ctx, wager: typing.Union[int, str]):
+        use_all = False;
+        try:
+            wager = int(wager)
+        except ValueError:
+            if wager.lower() == 'all':
+                use_all = True
+            else:
+                raise commands.BadArgument
+        else:
+            if wager < 0:
+                return await ctx.send("Cannot bet a negative value!")
 
         player, server = self.get_ids(ctx, ctx.author.id)
         balance = 10000
@@ -28,7 +69,9 @@ class Gacha(commands.Cog):
             self.init_server_table(ctx)
 
         initial_balance = balance
-        if (wager > initial_balance):
+        if (use_all):
+            wager = balance
+        elif (wager > initial_balance):
             return await ctx.send(
                 f"Unable to bet, wager must not exceed current balance! You have {initial_balance} point{'s'[:initial_balance^1]}."
             )
@@ -61,12 +104,13 @@ class Gacha(commands.Cog):
     @bet.error
     async def bet_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send('Use a numerical value when betting ' +
+            await ctx.send('Use a numerical value or `all` when betting ' +
                            emotes['paissabap'])
 
     @commands.command(
         help=
-        "Check your current balance, or join the betting table and receive a balance of 10000 points."
+        "Check your current balance, or join the betting table and receive a balance of 10000 points.",
+        aliases=['points']
     )
     async def balance(self, ctx):
         player, server = self.get_ids(ctx, ctx.author.id)
@@ -83,7 +127,8 @@ class Gacha(commands.Cog):
 
     @commands.command(
         help=
-        "Gacha for a chance to reset your point balance. Can only be used when points are below 10000."
+        "Gacha for a chance to reset your point balance. Can only be used when points are below 10000.",
+        aliases=['mercy', 'pls']
     )
     async def beg(self, ctx):
         player, server = self.get_ids(ctx, ctx.author.id)
@@ -92,7 +137,7 @@ class Gacha(commands.Cog):
                 f"Sorry, this command is only available for existing players! Use the command `{self.bot.ctx_prefix(ctx)}balance` to join the table."
             )
 
-        player_roll = randrange(0, 5)
+        player_roll = randrange(0, 4)
         if (db['gamble'][server][player] >= 10000):
             return await ctx.send(
                 f"You already have {db['gamble'][server][player]} points! No begging {emotes['paissabap']}"

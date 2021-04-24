@@ -13,8 +13,7 @@ class Admin(commands.Cog):
         server = str(ctx.guild.id)
         if ctx.author.id == self.MY_ID:
             try: 
-                for key in db['gamble'][server]:
-                    del db['gamble'][server][key]
+                del db['gamble'][server]
                 await ctx.send("eat the rich")
             except KeyError:
                 await ctx.send("no-op, table is already gone")
