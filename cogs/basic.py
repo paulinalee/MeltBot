@@ -25,6 +25,12 @@ class Basic(commands.Cog):
             return await ctx.send("Sorry! This command is only available in specific servers.")
         await ctx.send(f"{users['fy']} {emotes['kree']}")
     
+    @commands.command(help=':paissayay:', aliases=['hbd'])
+    async def cake(self, ctx):
+        if not self.in_server(ctx, users['dog']):
+            return await ctx.send("Sorry! This command is only available in specific servers.")
+        await ctx.send(f"{users['dog']} HAPPY BIRTHDAY {emotes['paissayay']}")
+
     @commands.command(help=':paissadab:')
     async def dab(self, ctx):
         await ctx.send(emotes['paissadab'])

@@ -42,6 +42,15 @@ class Admin(commands.Cog):
             await ctx.send("monkaSteer")
         else:
             await ctx.send("Perish this command is not for you")
+
+    @commands.command(help="[admin] drop raid table")
+    async def rdrop(self, ctx):
+        if (ctx.author.id == self.MY_ID):
+            if db['reminders']:
+                for key in db['reminders']:
+                    del db['reminders'][key]
+            del db['reminders']
+            await ctx.send("all done")
     
     @commands.command(help="[admin] log all tables")
     async def tables(self, ctx):
@@ -52,7 +61,7 @@ class Admin(commands.Cog):
             for key in db:
                 print(key)
                 for k in db[key]:
-                    print(db[key][k])
+                    print(f'KEY: {k} // VALUE: {db[key][k]}')
         else:
             await ctx.send("Perish this command is not for you")
 

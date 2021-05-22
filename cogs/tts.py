@@ -21,7 +21,7 @@ class TTS(commands.Cog):
 
         speech = ' '.join(args)
 
-        tts = gTTS(speech, lang='en')
+        tts = gTTS(speech, lang='en', tld='com.au')
         file = TemporaryFile()
         tts.write_to_fp(file)
         file.seek(0)

@@ -15,6 +15,8 @@ class MeltBot(Bot):
         intents.members = True
         super().__init__(command_prefix=self.determine_prefix, description="Your favorite Alter Ego, now as a bot. [under development]",
                 help_command=PrettyHelp(), intents=intents, case_insensitive=True)
+        if 'reminders' not in db:
+            db['reminders'] = {}
    
     def determine_prefix(self, bot, message):
         server = str(message.guild.id)

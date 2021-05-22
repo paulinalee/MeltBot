@@ -6,7 +6,9 @@ cogs = [
   'cogs.admin',
   'cogs.time',
   'cogs.probability',
-  'cogs.tts'
+  'cogs.tts',
+  'cogs.misc',
+  'cogs.raid'
 ]
 
 emotes = {
@@ -14,12 +16,14 @@ emotes = {
     'paimonfrench': '<:paimonfrench:779382643497369620>',
     'kree': '<a:kree:818022246730825749>',
     'paissadab': '<a:paissadab:781426491572879390>',
-    'frogpunch': '<a:frogpunch:827760096691617832>'
+    'frogpunch': '<a:frogpunch:827760096691617832>',
+    'paissayay': '<:paissayay:778218659981688853>'
 }
 
 users = {
     'kaina': '<@119265855434522628>',
-    'fy': '<@115223207107231744>'
+    'fy': '<@115223207107231744>',
+    'dog': '<@193320626134581248>'
 }
 
 poll_option_labels = [
