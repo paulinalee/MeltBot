@@ -327,6 +327,14 @@ version = "1.15.0"
 
 [[package]]
 category = "main"
+description = "Persistent dict in Python, backed up by sqlite3 and pickle, multithread-safe."
+name = "sqlitedict"
+optional = false
+python-versions = "*"
+version = "1.7.0"
+
+[[package]]
+category = "main"
 description = "Backported and Experimental Type Hints for Python 3.5+"
 name = "typing-extensions"
 optional = false
@@ -382,7 +390,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "4a4d4a999e0cbefd1832e153f41c3fffa83a7b56eae0cda756676be8b629a2a9"
+content-hash = "8c90bc0b8bfd7142d8c776597f8015a91266ddf2a4909f9f86fb5376b9d3d57b"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -723,6 +731,9 @@ schedule = [
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+sqlitedict = [
+    {file = "sqlitedict-1.7.0.tar.gz", hash = "sha256:2affcc301aacd4da7511692601ecbde392294205af418498f7d6d3ec0dbcad56"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.7.4.3-py2-none-any.whl", hash = "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"},

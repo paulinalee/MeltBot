@@ -1,5 +1,6 @@
 from discord.ext import commands
 from replit import db
+from sqlitedict import SqliteDict
 
 class Admin(commands.Cog):
     MY_ID = 192520503443849217
@@ -9,12 +10,12 @@ class Admin(commands.Cog):
         self.description="Admin/debug commands."
     
     @commands.command(help="[admin] reset points for this server")
-    async def equality(self, ctx):
+    async def perish(self, ctx):
         server = str(ctx.guild.id)
         if ctx.author.id == self.MY_ID:
             try: 
                 del db['gamble'][server]
-                await ctx.send("eat the rich")
+                await ctx.send("donezo")
             except KeyError:
                 await ctx.send("no-op, table is already gone")
         else:
@@ -51,9 +52,13 @@ class Admin(commands.Cog):
                     del db['reminders'][key]
             del db['reminders']
             await ctx.send("all done")
-    
+
     @commands.command(help="[admin] log all tables")
     async def tables(self, ctx):
+        for key, value in self.bot.gamble_db.iteritems():
+            print(f"key: {key} value: {value}")
+        for key, value in self.bot.prefix_db.iteritems():
+            print(f"key: {key} value: {value}")
         if (ctx.author.id == self.MY_ID):
             print('KEYS')
             print(db.keys())

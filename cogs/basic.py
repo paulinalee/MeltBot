@@ -3,11 +3,13 @@ from random import choices
 from config import emotes, users, dialogue
 import re
 from replit import db
+from sqlitedict import SqliteDict
 
 class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.description="Basic, simple bot commands."
+        self.db = SqliteDict('./prefix.sqlite', autocommit=True)
 
     @commands.command(help="Health check function.")
     async def hello(self, ctx):

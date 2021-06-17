@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 from random import randrange, choices
 from replit import db
+from sqlitedict import SqliteDict
 from config import emotes, beg_dialogue
 from disputils import BotEmbedPaginator
 import typing
@@ -12,6 +13,7 @@ class Gacha(commands.Cog):
         self.description = "Gambling functions."
         if 'gamble' not in db:
             db['gamble'] = {}
+        self.db = SqliteDict('./gamble.sqlite', autocommit=True)
 
     @commands.command(help="Check the betting leaderboard.", aliases=['leaderboards', 'rankings'])
     async def leaderboard(self, ctx):
@@ -145,6 +147,9 @@ class Gacha(commands.Cog):
 
         if (player_roll == 3):
             db['gamble'][server][player] = 10000
+            print(player + "!!!!!")
+            print(server + "!!!!!")
+            
             return await ctx.send(
                 f"Hmph, I guess I can reset your points just this once...")
         else:

@@ -5,6 +5,7 @@ from discord.ext.commands import Bot
 from pretty_help import PrettyHelp
 from replit import db
 import urllib3
+from sqlitedict import SqliteDict
 
 class MeltBot(Bot):
     DEFAULT_PREFIX = '!'
@@ -15,6 +16,7 @@ class MeltBot(Bot):
         intents.members = True
         super().__init__(command_prefix=self.determine_prefix, description="Your favorite Alter Ego, now as a bot. [under development]",
                 help_command=PrettyHelp(), intents=intents, case_insensitive=True)
+
         if 'reminders' not in db:
             db['reminders'] = {}
    

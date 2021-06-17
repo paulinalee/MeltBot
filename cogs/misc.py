@@ -7,8 +7,8 @@ class Misc(commands.Cog):
         self.description="Random other utilities"
     
     @commands.command(help="what's this")
-    async def owo(self, ctx, *args):
-        text = ' '.join(args)
+    async def owo(self, ctx, *message):
+        text = ' '.join(message)
         owo = OwO()
         await ctx.send(owo.whatsthis(text))
 

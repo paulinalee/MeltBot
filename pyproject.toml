@@ -17,6 +17,7 @@ gtts = "^2.2.2"
 requests = "^2.25.1"
 owotext = "^1.1.1"
 schedule = "^1.1.0"
+sqlitedict = "^1.7.0"
 
 [tool.poetry.dev-dependencies]
 
