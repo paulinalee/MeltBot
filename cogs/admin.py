@@ -8,13 +8,17 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.description="Admin/debug commands."
+        self.gamble_db = SqliteDict('./gamble.sqlite', autocommit=True)
+        self.remind_db = SqliteDict('./remind.sqlite', autocommit=True)
+        self.prefix_db = SqliteDict('./prefix.sqlite', autocommit=True)
     
     @commands.command(help="[admin] reset points for this server")
     async def perish(self, ctx):
         server = str(ctx.guild.id)
         if ctx.author.id == self.MY_ID:
             try: 
-                del db['gamble'][server]
+                # del db['gamble'][server]
+                del self.gamble_db[server]
                 await ctx.send("donezo")
             except KeyError:
                 await ctx.send("no-op, table is already gone")
@@ -55,9 +59,9 @@ class Admin(commands.Cog):
 
     @commands.command(help="[admin] log all tables")
     async def tables(self, ctx):
-        for key, value in self.bot.gamble_db.iteritems():
+        for key, value in self.gamble_db.iteritems():
             print(f"key: {key} value: {value}")
-        for key, value in self.bot.prefix_db.iteritems():
+        for key, value in self.prefix_db.iteritems():
             print(f"key: {key} value: {value}")
         if (ctx.author.id == self.MY_ID):
             print('KEYS')

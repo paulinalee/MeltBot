@@ -9,7 +9,7 @@ class Basic(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.description="Basic, simple bot commands."
-        self.db = SqliteDict('./prefix.sqlite', autocommit=True)
+        self.prefix_db = SqliteDict('./prefix.sqlite', autocommit=True)
 
     @commands.command(help="Health check function.")
     async def hello(self, ctx):
@@ -52,7 +52,7 @@ class Basic(commands.Cog):
     @commands.command(help='Change the bot prefix for this server.')
     async def prefix(self, ctx, new_prefix: str):
         server = str(ctx.guild.id)
-        db['prefix'][server] = new_prefix
+        self.prefix_db[server] = new_prefix
         await ctx.send(f"Prefix changed to `{new_prefix}`!")
 
 def setup(bot):

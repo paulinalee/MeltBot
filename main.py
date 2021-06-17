@@ -19,6 +19,7 @@ class MeltBot(Bot):
 
         if 'reminders' not in db:
             db['reminders'] = {}
+        self.prefix_db = SqliteDict('./prefix.sqlite', autocommit=True)
    
     def determine_prefix(self, bot, message):
         server = str(message.guild.id)
@@ -30,11 +31,8 @@ class MeltBot(Bot):
         return self.prefix_helper(server)
 
     def prefix_helper(self, server):
-        if 'prefix' not in db:
-            # init the server prefix db in case I wipe the db
-            db['prefix'] = {}
-        if server in db['prefix']:
-            return db['prefix'][server]
+        if server in self.prefix_db:
+            return self.prefix_db[server]
         else:
             return self.DEFAULT_PREFIX
 

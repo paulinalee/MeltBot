@@ -11,8 +11,6 @@ class Gacha(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.description = "Gambling functions."
-        if 'gamble' not in db:
-            db['gamble'] = {}
         self.db = SqliteDict('./gamble.sqlite', autocommit=True)
 
     @commands.command(help="Check the betting leaderboard.", aliases=['leaderboards', 'rankings'])
@@ -21,7 +19,7 @@ class Gacha(commands.Cog):
         if not self.server_table_exists(ctx):
             return await ctx.send(f"No leaderboard available, no one in the server has made any bets! Use `{self.bot.ctx_prefix(ctx)}help bet` to see how to play.")
 
-        server = db['gamble'][str(ctx.guild.id)]
+        server = self.db[str(ctx.guild.id)]
         leaderboard = sorted(server, key=server.get, reverse=True)
         
         output_list = []
@@ -65,7 +63,7 @@ class Gacha(commands.Cog):
         first_time = False
 
         if self.at_table(ctx, player):
-            balance = int(db['gamble'][server][player])
+            balance = self.db[server][player]
         else:
             first_time = True
             self.init_server_table(ctx)
@@ -101,13 +99,19 @@ class Gacha(commands.Cog):
                                 balance,
                                 'points' if balance != 1 else 'point'))
 
-        db['gamble'][server][player] = balance
+        self.update_balance(server, player, balance)
+        print(self.db[server][player])
 
     @bet.error
     async def bet_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
             await ctx.send('Use a numerical value or `all` when betting ' +
                            emotes['paissabap'])
+
+    def update_balance(self, server, player, new_balance):
+        server_table = self.db[server]
+        server_table[player] = new_balance
+        self.db[server] = server_table
 
     @commands.command(
         help=
@@ -118,12 +122,12 @@ class Gacha(commands.Cog):
         player, server = self.get_ids(ctx, ctx.author.id)
         if self.at_table(ctx, player):
             await ctx.send(
-                f"Your balance is {int(db['gamble'][server][player])} point{'s'[:int(db['gamble'][server][player])^1]}."
+                f"Your balance is {int(self.db[server][player])} point{'s'[:int(self.db[server][player])^1]}."
             )
         else:
             if not self.server_table_exists(ctx):
                 self.init_server_table(ctx)
-            db['gamble'][server][player] = 10000
+            self.update_balance(server, player, 10000)
             await ctx.send(
                 'Welcome to the betting table! Your balance is 10000 points.')
 
@@ -140,21 +144,19 @@ class Gacha(commands.Cog):
             )
 
         player_roll = randrange(0, 4)
-        if (db['gamble'][server][player] >= 10000):
-            return await ctx.send(
-                f"You already have {db['gamble'][server][player]} points! No begging {emotes['paissabap']}"
+        print(self.db[server][player])
+        if (self.db[server][player] >= 10000):
+             return await ctx.send(
+                f"You already have {self.db[server][player]} points! No begging {emotes['paissabap']}"
             )
 
         if (player_roll == 3):
-            db['gamble'][server][player] = 10000
-            print(player + "!!!!!")
-            print(server + "!!!!!")
-            
+            self.update_balance(server, player, 10000)
             return await ctx.send(
                 f"Hmph, I guess I can reset your points just this once...")
         else:
             await ctx.send(
-                f"{choices(beg_dialogue)[0]} (It seems your efforts were unsuccessful... Your balance remains {db['gamble'][server][player]} point{'s'[:int(db['gamble'][server][player])^1]}.)"
+                f"{choices(beg_dialogue)[0]} (It seems your efforts were unsuccessful... Your balance remains {self.db[server][player]} point{'s'[:int(self.db[server][player])^1]}.)"
             )
 
     @commands.command(help="Gift another player points from your own balance.",
@@ -174,31 +176,29 @@ class Gacha(commands.Cog):
         if (points < 0):
             return await ctx.send(f"Unable to gift negative point value!")
 
-        player_pts = int(db['gamble'][server][player])
+        player_pts = self.db[server][player]
 
         if (points > player_pts):
             return await ctx.send(
                 f"Unable to gift, gift value exceeds your current balance of {player_pts}!"
             )
 
-        db['gamble'][server][target_player] += points
-        db['gamble'][server][player] -= points
+        self.update_balance(server, target_player, self.db[server][target_player] + points)
+        self.update_balance(server, player, self.db[server][player] - points)
+        print(self.db[server][player])
         await ctx.send(
-            f"{target.mention}, you have been gifted {points} point{'s'[:int(db['gamble'][server][player])^1]} by {ctx.author.mention}! Your balance is now {int(db['gamble'][server][target_player])}."
+            f"{target.mention}, you have been gifted {points} point{'s'[:int(self.db[server][player])^1]} by {ctx.author.mention}! Your balance is now {int(self.db[server][target_player])}."
         )
 
     def at_table(self, ctx, player_id):
         player, server = self.get_ids(ctx, player_id)
-        return self.server_table_exists(ctx) and player in db['gamble'][server]
+        return self.server_table_exists(ctx) and player in self.db[server]
 
     def server_table_exists(self, ctx):
-        return str(ctx.guild.id) in db['gamble']
+        return str(ctx.guild.id) in self.db
 
     def init_server_table(self, ctx):
-        if 'gamble' not in db:
-            db['gamble'] = {}
-
-        db['gamble'][str(ctx.guild.id)] = {}
+        self.db[str(ctx.guild.id)] = {}
 
     def get_ids(self, ctx, player_id: int):
         # returns player id (as string) and server id (as string) so I don't have to keep converting them
